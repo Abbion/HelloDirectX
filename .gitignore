@@ -27,6 +27,13 @@
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
+
+.vs/
+bin/
+bin-int/
+
+*.sln
+*.vcxproj
+*.vcxproj.user
