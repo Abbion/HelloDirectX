@@ -94,7 +94,8 @@ project "DxFrameWork"
 
     links
     {
-        "GLFW"
+        "GLFW",
+        "d3d11.lib"
     }
 
     filter "system:windows"

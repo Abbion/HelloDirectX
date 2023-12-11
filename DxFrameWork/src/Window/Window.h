@@ -5,10 +5,16 @@
 #include "GLFW/glfw3.h"
 #include <GLFW/glfw3native.h>
 
+#include "Graphics/Graphics.h"
+#include "Keyboard/Keyboard.h"
+#include "Mouse/Mouse.h"
+#include "Events/EventQueue.h"
+
 #include <DirectXMath.h>
-#include <d3d11.h>
 
 #include <string>
+#include <memory>
+#include <wrl.h>
 
 namespace FW
 {
@@ -20,24 +26,41 @@ namespace FW
 		const DirectX::XMUINT2 GetDimensions() const { return m_windowDimensions; }
 		const bool IsOpen() const;
 
+		Graphics& GetGraphics() { return *m_graphics; }
+		Keyboard& GetKeyboard() { return m_keyboard; }
+		Mouse& GetMouse()		{ return m_mouse; }
+
+		std::shared_ptr<EventQueue>& GetEventQueue() { return m_eventQueue; }
+
+		void HandleInternalEvents();
 		void PoolEvents();
-		void SwapBuffers();
+		void Close();
+
 		static void Terminate();
 
 	private:
-		void static error_callback(int error, const char* description);
+		void InitCallBacks();
+		HWND GetNativeWindowHandle() const { return glfwGetWin32Window(m_systemWindow); }
 
 	private:
+		struct WindowPointerDataStruct {
+			std::shared_ptr<EventQueue> eventQueue;
+		};
+
+		WindowPointerDataStruct m_windowPointerDataStruct;
+
 		DirectX::XMUINT2 m_windowDimensions{ 1, 1 };
 		std::string m_windowName;
 
 		GLFWwindow* m_systemWindow;
 
-		ID3D11Device* m_device{ nullptr };
-		IDXGISwapChain* m_swapChain{ nullptr };
-		ID3D11DeviceContext* m_context{ nullptr };
-		ID3D11RenderTargetView* m_backBufferView{ nullptr };
+		std::shared_ptr<EventQueue> m_eventQueue;
+		std::unique_ptr<Graphics> m_graphics;
+		Keyboard m_keyboard;
+		Mouse m_mouse;
 
 		inline static bool m_globalInit{ false };
+
+		friend Graphics;
 	};
 }
